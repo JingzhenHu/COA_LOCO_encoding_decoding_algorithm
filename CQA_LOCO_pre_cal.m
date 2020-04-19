@@ -1,9 +1,8 @@
 % pre_calculation storage for CQA_LOCO encoding and decoding
 % 
 
-function pre_cal = CQA_LOCO_pre_cal(m,x,q)
-% compute all the cardinalities
-N_q = cardinality(m,x,q);
+function pre_cal = CQA_LOCO_pre_cal(N_q,m,x,q)
+
 % store all the possible data needed for the run-time in a cell
 % with O((q-1)xlog2q)
 pre_cal = cell(q-1,x+1,m+x+1);

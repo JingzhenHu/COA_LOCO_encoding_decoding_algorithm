@@ -1,9 +1,6 @@
 % pre_calculation storage for 1/2-storage encoding and decoding
 
-function [pre_cal,power_of_2] = store_half_pre_cal(m,x,q)
-
-% compute all the cardinalities
-N_q = cardinality(m,x,q);
+function [pre_cal] = store_half_pre_cal(N_q,m,x,q)
 
 % store all the possible data needed for the run-time in a cell
 % with O((qx/2+1)log2q)
@@ -22,7 +19,7 @@ for i = 1:2:q-1 % only odd of them
     end
 end
 
-power_of_2 = 2.^(0:log2(q)-1);
+% power_of_2 = 2.^(0:log2(q)-1);
 
 end
 

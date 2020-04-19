@@ -1,9 +1,10 @@
-% Algorithm 1 Encoding CQA-LOCO Codes with pre_storage
-% by?ArXiv, abs/2001.02325
+% store_least_encoding
+% input: bin_mess, stor_data(pre_calculation), m, x, q
+% output: the corresponding encoded LOCO code
 
-function encoded_CQA_LOCO = CQA_LOCO_encoding_w_storage(bin_mess,stor_data,m,x,q)
+function encoded_CQA_LOCO = store_least_encoding(bin_mess,stor_data,m,x,q)
 
-s_c = floor(log2(stor_data{1,1,m+x+1}-2)); % the length in bits
+s_c = floor(log2(stor_data{1,m+x+1}-2)); % the length in bits
 
 tol_len = size(bin_mess,2); 
 % split into pieces with each piece equal or less than s_c
@@ -14,10 +15,12 @@ post = s_c;
 encoded_CQA_LOCO = zeros(1,(m+x)*quto-x); 
 s_ta = 1;
 e_nd = m;
+% r = size(stor_data,1);
+r = log2(q);
 % it use the L-function in paper to represent the CQA_LOCO codewords
 % {0,1,alpha,alpha^2,...,alpha^(q-2)} = {0,1,2,3,...,q-1} 
 for j = 1:quto
-    rank = bin2dec(bin_mess(pre:post)) + 1; 
+    rank = bin2dec(bin_mess(pre:post)) + 1; %+ 1;
     pre = pre + s_c;
     if j == quto-1
         post = tol_len;
@@ -35,25 +38,19 @@ for j = 1:quto
                 break
             end
         end
-
         index = i - gamma(i) + x;
-        first = stor_data{1,gamma(i)+1,index}; 
-        last = stor_data{q-1,gamma(i)+1,index};
-        if res < first% (q-1)^gamma(i)*N_q(1,index)
-            a(i) = 0;
-        elseif res >= last % (q-1)^(gamma(i)+1)*N_q(1,index)
-            a(i) = q-1;
-            res = res - last; % (q-1)^(gamma(i)+1)*N_q(1,index);
-        else
-            for l = 1:q-2
-                if stor_data{l,gamma(i)+1,index} <= res && res < stor_data{l+1,gamma(i)+1,index} 
-                % if l*(q-1)^gamma(i)*N_q(1,index) <= res && res < (l+1)*(q-1)^gamma(i)*N_q(1,index)
-                    a(i) = l;
-                    res = res - stor_data{l,gamma(i)+1,index}; %l*(q-1)^gamma(i)*N_q(1,index);
-                    break
-                end
+        
+        v = zeros(1,r);
+        temp = 2^(r-1)*stor_data{gamma(i)+1,index};
+        for k = r-1:-1:0
+            if res >= temp
+                v(k+1) = 1;
+                res = res - temp;
+                a(i) = a(i) + 2^k*stor_data{1,1+x};
             end
+            temp = temp/2;
         end
+        
         % bridging
         if j ~= 1 && i == m
             if encoded_CQA_LOCO(e_nd) == q-1 && a(i) == q-1

@@ -1,5 +1,8 @@
+% store_least_decoding
+% input: LOCO code, stor_data(pre_calculation), m, x, q, s_c
+% output: the corresponding decoded binary message
 
-function bin_mess = store_half_decoding(CQA_LOCO,stor_data,m,x,q,s_c) %,power_of_2
+function bin_mess = store_least_decoding(CQA_LOCO,stor_data,m,x,q,s_c) 
 
 % s_c = floor(log2(stor_data{1,1,m+2}-2)); % the length in bits
 
@@ -9,8 +12,7 @@ quto = ceil(tol_len/(m+x));
 pre = 1;
 bin_mess = zeros(1,s_c*quto);
 sta = 1;
-% v = zeros(1,q-1);
-% v(1:2:q-1) = 1:2^(r-1); % power_of_2(r)
+r = log2(q);
 for j = 1:quto
     rank = 0;
     a = CQA_LOCO(pre:pre+m-1); 
@@ -29,20 +31,21 @@ for j = 1:quto
             end
         end
         if a(i) ~= 0
-            if mod(a(i),2) == 1
-                address = (a(i)+1)/2; 
-                rank = rank + stor_data{address,gamma(i)+1,index}; % a(i)*(q-1)^gamma(i)*N_q(1,index);
-%                 rank = rank + stor_data{v(a(i)),gamma(i)+1,index}; % a(i)*(q-1)^gamma(i)*N_q(1,index);
-            else
-                address = a(i)/2; 
-                rank = rank + stor_data{address,gamma(i)+1,index} + stor_data{1,gamma(i)+1,index};
-%                 rank = rank + stor_data{v(a(i)-1),gamma(i)+1,index} + stor_data{1,gamma(i)+1,index};
+            res = a(i);
+            for k = r-1:-1:0
+                temp = 2^k;
+                if res >= temp 
+                    rank = rank + 2^k*stor_data{gamma(i)+1,index}; %stor_data{k,gamma(i)+1,index};
+                    res = res - temp;
+                end
             end
         end
     end
+    
     bin_mess(sta:sta+s_c-1) = de2bi(rank - 1,s_c);
     sta = sta + s_c;
     pre = pre + m + x;
 end
 
 end
+

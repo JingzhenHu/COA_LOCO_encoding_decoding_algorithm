@@ -1,6 +1,6 @@
 % Algorithm 1 Encoding CQA-LOCO Codes with pre_storage
 
-function encoded_CQA_LOCO = store_half_encoding(bin_mess,stor_data,power_of_2,m,x,q)
+function encoded_CQA_LOCO = store_half_encoding(bin_mess,stor_data,m,x,q) % power_of_2
 
 s_c = floor(log2(stor_data{1,1,m+x+1}-2)); % the length in bits
 
@@ -13,7 +13,8 @@ post = s_c;
 encoded_CQA_LOCO = zeros(1,(m+x)*quto-x); 
 s_ta = 1;
 e_nd = m;
-
+r = log2(q);
+the_last_idx = 2^(r-1);
 % it use the L-function in paper to represent the CQA_LOCO codewords
 % {0,1,alpha,alpha^2,...,alpha^(q-2)} = {0,1,2,3,...,q-1} 
 for j = 1:quto
@@ -36,35 +37,58 @@ for j = 1:quto
             end
         end
         index = i - gamma(i) + x;
-        r = size(power_of_2,2);
-        
-        if res >= stor_data{power_of_2(r),gamma(i)+1,index} % (q-1)^(gamma(i)+1)*N_q(1,index)
+        unit = stor_data{1,gamma(i)+1,index};
+        comparsion = 2*unit;
+        the_last_store = stor_data{the_last_idx,gamma(i)+1,index}; % power_of_2(r)
+        if res >=  the_last_store% (q-1)^(gamma(i)+1)*N_q(1,index) 
             a(i) = q-1;
-            res = res - stor_data{power_of_2(r),gamma(i)+1,index}; % (q-1)^(gamma(i)+1)*N_q(1,index);
+            res = res - the_last_store; % (q-1)^(gamma(i)+1)*N_q(1,index);
         else
             L = 0;
-            R = stor_data{power_of_2(r),gamma(i)+1,index};
+            R = the_last_store;
             l = r-1;
             trace = 0;
+            power_of_2 = 2^(l-1);
             while l > 0 %(R-L) > (stor_data{1,gamma(i)+1,index} + stor_data{1,gamma(i)+1,index})
-                % l>0
-                mid = power_of_2(l)+trace;
+%                 if res <= unit
+%                     L = 0;
+%                     break
+%                 end
+                mid = power_of_2 + trace; % power_of_2(l)
                 T = stor_data{mid,gamma(i)+1,index};
+%                 cond = res - T;
                 if res >= T
+%                     if cond <= comparsion
+%                         L = T;
+%                         R = T + comparsion;
+%                         break
+%                     elseif R - res <= comparsion
+%                         L = R - comparsion;
+%                         break
+%                     end
                     L = T;
-                    trace = trace + power_of_2(l);
+                    trace = trace + power_of_2; % power_of_2(l);
                 else
+%                     if -cond <= comparsion
+%                         R = T;
+%                         L = R - comparsion;
+%                         break
+%                     elseif  res - L <= comparsion
+%                         R = L + comparsion;
+%                         break
+%                     end
                     R = T;
                 end
                 l = l-1;
+                power_of_2 = power_of_2/2;
             end
             if L ~= 0
                 if (res - L) < (R - res)
-                    a(i) = trace + trace - 1;%stor_data{trace,1,1+x};
+                    a(i) = 2*trace - 1;%stor_data{trace,1,1+x};
                     res = res - L; %a(i)*(q-1)^gamma(i)*N_q(1,index);
                 else
                     a(i) = trace + trace; %stor_data{trace,1,1+x}+1;
-                    res = res - L - stor_data{1,gamma(i)+1,index}; %l*(q-1)^gamma(i)*N_q(1,index);
+                    res = res - L - unit; %l*(q-1)^gamma(i)*N_q(1,index);
                 end
             end
         end
