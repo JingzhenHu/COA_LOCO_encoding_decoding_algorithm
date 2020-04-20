@@ -1,4 +1,4 @@
-% test for randomly pick up ranks of symbols between 20-50 for encoding and
+% test for randomly pick up indices of loco code with length m for encoding and
 % feed the results back to decoding to see whether they match and measure
 % the running time for each methods
 
