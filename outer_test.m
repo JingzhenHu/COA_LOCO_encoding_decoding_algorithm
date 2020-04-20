@@ -2,11 +2,7 @@
 % feed the results back to decoding to see whether they match and measure
 % the running time for each methods
 
-clear
-q = 32; % log2(the number of levels per Flash cell)
-% alpha = a primitive root of x^(q-1) = 1
-x = 1; % for new device, lower; old device, higher
-m = 50; % choose the smallest length to achieve a good rate based one table
+function run_time_measure = outer_test(m,x,q,test_num)
 
 run_time_measure = zeros(3,2);
 
@@ -21,7 +17,6 @@ pre_cal_least = store_least_pre_cal(N_q,m,x,q); % the least storage
 tol = N_q(1,m+x+1);
 s_c = floor(log2(tol-2));
 % randomly choose a subset of loco_index with fixed size
-test_num = 30000;
 check = zeros(test_num,1);
 if s_c < 53
     check = randi(2^s_c,test_num,1)-1;
@@ -94,6 +89,7 @@ else
     'least encoding/decoding sth wrong'
 end
 
+end
 
 
 
