@@ -29,6 +29,7 @@ and m,x,q,s_c = log2(N_q(m,x)-2).
 
 and their output is
 bin_mess: the binary string that is associated to the input LOCO code
+
 ------------------------------------------------------------------------
 outer_test.m
 
