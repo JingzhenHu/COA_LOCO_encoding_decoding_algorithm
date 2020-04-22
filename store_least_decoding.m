@@ -32,10 +32,11 @@ for j = 1:quto
         end
         if a(i) ~= 0
             res = a(i);
+            data = stor_data{gamma(i)+1,index};
             for k = r-1:-1:0
                 temp = 2^k;
                 if res >= temp 
-                    rank = rank + 2^k*stor_data{gamma(i)+1,index}; %stor_data{k,gamma(i)+1,index};
+                    rank = rank + 2^k*data; %stor_data{k,gamma(i)+1,index};
                     res = res - temp;
                 end
             end
